@@ -2686,7 +2686,7 @@ function AdminCourses(_ref10) {
     courseId: videoModal.courseId,
     video: videoModal.video,
     data: data,
-    setData: setData,
+    setData: smartSetData,
     notify: notify,
     onClose: function onClose() {
       return setVideoModal(null);
@@ -2695,7 +2695,7 @@ function AdminCourses(_ref10) {
     courseId: quizModal.courseId,
     videoId: quizModal.videoId,
     data: data,
-    setData: setData,
+    setData: smartSetData,
     notify: notify,
     onClose: function onClose() {
       return setQuizModal(null);
@@ -3516,24 +3516,24 @@ function AdminPanel(_ref14) {
     data: data
   }), adminSection === "users" && /*#__PURE__*/React.createElement(AdminUsers, {
     data: data,
-    setData: setData,
+    setData: smartSetData,
     setModal: setModal,
     notify: notify,
     syncUsers: syncUsers
   }), adminSection === "courses" && /*#__PURE__*/React.createElement(AdminCourses, {
     data: data,
-    setData: setData,
+    setData: smartSetData,
     setModal: setModal,
     notify: notify
   }), adminSection === "reviews" && /*#__PURE__*/React.createElement(AdminReviews, {
     data: data,
-    setData: setData,
+    setData: smartSetData,
     notify: notify
   }), adminSection === "links" && /*#__PURE__*/React.createElement(AdminLinksPanel, {
     notify: notify
   }), adminSection === "settings" && /*#__PURE__*/React.createElement(AdminSettings, {
     data: data,
-    setData: setData,
+    setData: smartSetData,
     notify: notify
   })));
 }
@@ -4324,11 +4324,20 @@ function App() {
     });
   };
  
-  // حفظ تلقائي عند كل تغيير في البيانات
-  useEffect(function () {
-    SiteDB.saveCourses(data.courses);
-    if (data.settings) SiteDB.saveSettings(data.settings);
-  }, [data.courses, data.settings]);
+  // setData الذكية: تحفظ في localStorage فوراً عند أي تعديل على الدورات أو الإعدادات
+  var smartSetData = function smartSetData(updater) {
+    setData(function(prevData) {
+      var next = typeof updater === 'function' ? updater(prevData) : updater;
+      // حفظ فوري بعد كل تغيير
+      if (next.courses !== prevData.courses) {
+        SiteDB.saveCourses(next.courses);
+      }
+      if (next.settings !== prevData.settings && next.settings) {
+        SiteDB.saveSettings(next.settings);
+      }
+      return next;
+    });
+  };
   var notify = function notify(msg) {
     var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "success";
     setNotification({
@@ -4413,7 +4422,7 @@ function App() {
     modal: modal,
     setModal: setModal,
     data: data,
-    setData: setData,
+    setData: smartSetData,
     notify: notify,
     syncUsers: syncUsers
   }), /*#__PURE__*/React.createElement("nav", {
@@ -4518,7 +4527,7 @@ function App() {
     setFilterCat: setFilterCat
   }), page === "links" && /*#__PURE__*/React.createElement(LinksPage, {
     data: data,
-    setData: setData,
+    setData: smartSetData,
     user: user,
     notify: notify
   }), page === "course-view" && /*#__PURE__*/React.createElement(CourseViewPage, {
@@ -4527,7 +4536,7 @@ function App() {
     user: user,
     notify: notify,
     data: data,
-    setData: setData
+    setData: smartSetData
   }), page === "login" && /*#__PURE__*/React.createElement(LoginPage, {
     loginForm: loginForm,
     setLoginForm: setLoginForm,
@@ -4545,7 +4554,7 @@ function App() {
     setSelectedCourse: setSelectedCourse
   }), page === "admin" && user && user.role === "admin" && /*#__PURE__*/React.createElement(AdminPanel, {
     data: data,
-    setData: setData,
+    setData: smartSetData,
     adminSection: adminSection,
     setAdminSection: setAdminSection,
     setModal: setModal,
