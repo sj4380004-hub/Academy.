@@ -116,6 +116,8 @@
     @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
     @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.6; } }
     @keyframes slideIn { from { transform:translateX(100%); } to { transform:translateX(0); } }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .spinner { border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid #6c47ff; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; display: inline-block; }
     .nav-link { cursor:pointer; padding:8px 16px; border-radius:8px; transition:all 0.2s; color:#b0b0c8; font-size:15px; }
     .nav-link:hover { background:rgba(108,71,255,0.15); color:#a78bfa; }
     .nav-link.active { color:#a78bfa; }
@@ -227,8 +229,7 @@
       allowRegistration: true
     },
     reviews: [
-      { id: 1, user: "أحمد محمد", course: "التكامل", rating: 5, text: "شرح رائع ومفهوم جداً", date: "2026-05-01", status: "approved" },
-      { id: 2, user: "سارة علي", course: "الميكانيكا", rating: 4, text: "محتوى ممتاز وشامل", date: "2026-05-10", status: "pending" }
+      { id: 1, user: "أحمد محمد", course: "التكامل", rating: 5, text: "شرح رائع ومفهوم جداً", date: "2026-01-01" }
     ]
   };
 
@@ -445,10 +446,10 @@
     };
 
     return (
-      React.createElement("div", { className: "modal-overlay", onClick: () => setModal(null) },
-        React.createElement("div", { className: "modal-box", onClick: e => e.stopPropagation() },
-          React.createElement("h3", { style: { fontSize: 24, fontWeight: 700, marginBottom: 20, color: "#e8e8f0" } }, modal.title),
-          modal.type === "edit-user" && (
+      React.createElement("div", { className: "modal-overlay" },
+        React.createElement("div", { className: "modal-box" },
+          React.createElement("h3", { style: { marginBottom: 24, fontSize: 22 } }, modal.title),
+          modal.type === "edit-user" || modal.type === "add-user" ? (
             React.createElement("div", null,
               React.createElement("div", { style: { marginBottom: 16 } },
                 React.createElement("label", { style: { display: "block", marginBottom: 8, color: "#b0b0c8" } }, "الاسم"),
@@ -459,8 +460,8 @@
                 React.createElement("input", { type: "email", name: "email", value: form.email || '', onChange: handleChange, className: "input-field" })
               ),
               React.createElement("div", { style: { marginBottom: 16 } },
-                React.createElement("label", { style: { display: "block", marginBottom: 8, color: "#b0b0c8" } }, "الدور"),
-                React.createElement("select", { name: "role", value: form.role || '', onChange: handleChange, className: "input-field" },
+                React.createElement("label", { style: { display: "block", marginBottom: 8, color: "#b0b0c8" } }, "الرتبة"),
+                React.createElement("select", { name: "role", value: form.role || 'student', onChange: handleChange, className: "input-field" },
                   React.createElement("option", { value: "student" }, "طالب"),
                   React.createElement("option", { value: "teacher" }, "معلم"),
                   React.createElement("option", { value: "admin" }, "مدير")
@@ -468,42 +469,18 @@
               ),
               React.createElement("div", { style: { marginBottom: 16 } },
                 React.createElement("label", { style: { display: "block", marginBottom: 8, color: "#b0b0c8" } }, "الحالة"),
-                React.createElement("select", { name: "status", value: form.status || '', onChange: handleChange, className: "input-field" },
+                React.createElement("select", { name: "status", value: form.status || 'active', onChange: handleChange, className: "input-field" },
                   React.createElement("option", { value: "active" }, "نشط"),
-                  React.createElement("option", { value: "banned" }, "محظور")
+                  React.createElement("option", { value: "banned" }, "موقوف")
                 )
               )
             )
-          ),
-          modal.type === "add-user" && (
-            React.createElement("div", null,
-              React.createElement("div", { style: { marginBottom: 16 } },
-                React.createElement("label", { style: { display: "block", marginBottom: 8, color: "#b0b0c8" } }, "الاسم"),
-                React.createElement("input", { type: "text", name: "name", value: form.name || '', onChange: handleChange, className: "input-field" })
-              ),
-              React.createElement("div", { style: { marginBottom: 16 } },
-                React.createElement("label", { style: { display: "block", marginBottom: 8, color: "#b0b0c8" } }, "البريد الإلكتروني"),
-                React.createElement("input", { type: "email", name: "email", value: form.email || '', onChange: handleChange, className: "input-field" })
-              ),
-              React.createElement("div", { style: { marginBottom: 16 } },
-                React.createElement("label", { style: { display: "block", marginBottom: 8, color: "#b0b0c8" } }, "كلمة المرور (افتراضي: 123456)"),
-                React.createElement("input", { type: "password", name: "password", value: form.password || '', onChange: handleChange, className: "input-field" })
-              ),
-              React.createElement("div", { style: { marginBottom: 16 } },
-                React.createElement("label", { style: { display: "block", marginBottom: 8, color: "#b0b0c8" } }, "الدور"),
-                React.createElement("select", { name: "role", value: form.role || '', onChange: handleChange, className: "input-field" },
-                  React.createElement("option", { value: "student" }, "طالب"),
-                  React.createElement("option", { value: "teacher" }, "معلم"),
-                  React.createElement("option", { value: "admin" }, "مدير")
-                )
-              )
-            )
-          ),
+          ) : null,
           modal.type === "edit-settings" && (
             React.createElement("div", null,
               Object.entries(form).map(([key, value]) => (
                 React.createElement("div", { key: key, style: { marginBottom: 16 } },
-                  React.createElement("label", { style: { display: "block", marginBottom: 8, color: "#b0b0c8" } }, key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()))),
+                  React.createElement("label", { style: { display: "block", marginBottom: 8, color: "#b0b0c8" } }, key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())),
                   key === 'maintenanceMode' || key === 'allowRegistration' ? (
                     React.createElement("input", { type: "checkbox", name: key, checked: value === 'true' || value === true, onChange: handleChange, style: { marginRight: 8 } })
                   ) : (
@@ -707,14 +684,6 @@
       persistLinks(links.filter(l => l.id !== id));
     };
 
-    const handleDragEnd = (result) => {
-      if (!result.destination) return;
-      const items = Array.from(links);
-      const [reorderedItem] = items.splice(result.source.index, 1);
-      items.splice(result.destination.index, 0, reorderedItem);
-      persistLinks(items);
-    };
-
     return (
       React.createElement("div", { style: { maxWidth: 900, margin: "40px auto", padding: "0 20px" } },
         React.createElement("h2", { style: { fontSize: 28, fontWeight: 700, marginBottom: 30, textAlign: "center", color: "#e8e8f0" } }, "روابط مفيدة"),
@@ -722,28 +691,21 @@
           React.createElement("button", { className: "btn-primary", onClick: () => setEditMode(!editMode) }, editMode ? "إنهاء التعديل" : "تعديل الروابط"),
           React.createElement("button", { className: "btn-success", onClick: openAdd, style: { marginRight: 10 } }, "+ إضافة رابط جديد")
         ),
-        React.createElement(DragDropContext, { onDragEnd: handleDragEnd },
-          React.createElement(Droppable, { droppableId: "links" }, (provided) => (
-            React.createElement("div", { ...provided.droppableProps, ref: provided.innerRef },
-              links.map((link, index) => (
-                React.createElement(Draggable, { key: link.id, draggableId: String(link.id), index: index }, (provided) => (
-                  React.createElement("div", { ref: provided.innerRef, ...provided.draggableProps, ...provided.dragHandleProps, className: "card", style: { ...provided.draggableProps.style, display: "flex", alignItems: "center", marginBottom: 15, padding: "15px 20px", borderLeft: `5px solid ${link.color || '#6c47ff'}` } },
-                    React.createElement("div", { style: { fontSize: 24, marginRight: 15 } }, link.icon),
-                    React.createElement("div", { style: { flexGrow: 1 } },
-                      React.createElement("h3", { style: { fontSize: 18, fontWeight: 600, color: "#e8e8f0", marginBottom: 5 } }, link.title),
-                      React.createElement("p", { style: { fontSize: 13, color: "#b0b0c8" } }, link.description)
-                    ),
-                    React.createElement("a", { href: link.url, target: "_blank", rel: "noopener noreferrer", style: { color: "#a78bfa", textDecoration: "none", marginLeft: 20, fontSize: 14 } }, "زيارة"),
-                    isAdmin && editMode && (
-                      React.createElement("div", { style: { marginLeft: 15, display: "flex", gap: 10 } },
-                        React.createElement("button", { className: "btn-outline", onClick: () => openEdit(link) }, "تعديل"),
-                        React.createElement("button", { className: "btn-danger", onClick: () => handleDelete(link.id) }, "حذف")
-                      )
-                    )
-                  )
-                ))
-              )),
-              provided.placeholder
+        React.createElement("div", null,
+          links.map((link, index) => (
+            React.createElement("div", { key: link.id, className: "card", style: { display: "flex", alignItems: "center", marginBottom: 15, padding: "15px 20px", borderLeft: `5px solid ${link.color || '#6c47ff'}` } },
+              React.createElement("div", { style: { fontSize: 24, marginRight: 15 } }, link.icon),
+              React.createElement("div", { style: { flexGrow: 1 } },
+                React.createElement("h3", { style: { fontSize: 18, fontWeight: 600, color: "#e8e8f0", marginBottom: 5 } }, link.title),
+                React.createElement("p", { style: { fontSize: 13, color: "#b0b0c8" } }, link.description || link.desc)
+              ),
+              React.createElement("a", { href: link.url, target: "_blank", rel: "noopener noreferrer", style: { color: "#a78bfa", textDecoration: "none", marginLeft: 20, fontSize: 14 } }, "زيارة"),
+              isAdmin && editMode && (
+                React.createElement("div", { style: { marginLeft: 15, display: "flex", gap: 10 } },
+                  React.createElement("button", { className: "btn-outline", onClick: () => openEdit(link) }, "تعديل"),
+                  React.createElement("button", { className: "btn-danger", onClick: () => handleDelete(link.id) }, "حذف")
+                )
+              )
             )
           ))
         ),
@@ -799,290 +761,192 @@
         }
       });
       setQuizResult({ score, total: activeVideo.quiz.length });
-      notify(`لقد أحرزت ${score} من ${activeVideo.quiz.length} في الاختبار!`);
     };
+
+    if (!activeVideo) return React.createElement("div", { style: { textAlign: "center", padding: 100 } }, "لا يوجد فيديوهات متاحة لهذه الدورة");
 
     return (
       React.createElement("div", { style: { maxWidth: 1200, margin: "40px auto", padding: "0 20px" } },
-        React.createElement("button", { className: "btn-outline", onClick: () => setPage("courses"), style: { marginBottom: 20 } }, "← العودة للدورات"),
-        React.createElement("h2", { style: { fontSize: 32, fontWeight: 700, marginBottom: 20, color: "#e8e8f0" } }, course.title),
-        React.createElement("div", { style: { display: "grid", gridTemplateColumns: "2fr 1fr", gap: 30 } },
-          React.createElement("div", null,
-            activeVideo && React.createElement("div", { style: { marginBottom: 30 } },
-              React.createElement("iframe", { className: "yt-embed", src: `https://www.youtube.com/embed/${extractYouTubeId(activeVideo.youtubeId )}`, allowFullScreen: true, title: activeVideo.title }),
-              React.createElement("h3", { style: { fontSize: 24, fontWeight: 600, marginTop: 20, color: "#e8e8f0" } }, activeVideo.title),
-              React.createElement("p", { style: { color: "#b0b0c8", marginTop: 10 } }, activeVideo.duration)
-            ),
-            activeVideo && activeVideo.quiz && activeVideo.quiz.length > 0 && (
-              React.createElement("div", { className: "card", style: { marginTop: 30 } },
-                React.createElement("h3", { style: { fontSize: 20, fontWeight: 600, marginBottom: 20, color: "#e8e8f0" } }, "اختبار الدرس"),
-                activeVideo.quiz.map((q, qIndex) => (
-                  React.createElement("div", { key: qIndex, style: { marginBottom: 20 } },
-                    React.createElement("p", { style: { fontWeight: 600, marginBottom: 10, color: "#e8e8f0" } }, `${qIndex + 1}. ${q.q}`),
-                    q.options.map((option, oIndex) => (
-                      React.createElement("div", { key: oIndex, className: `quiz-option ${selectedAnswers[qIndex] === oIndex ? 'selected' : ''} ${quizResult && oIndex === q.answer ? 'correct' : ''} ${quizResult && selectedAnswers[qIndex] === oIndex && oIndex !== q.answer ? 'wrong' : ''}`, onClick: () => handleAnswerSelect(qIndex, oIndex) }, option)
+        React.createElement("div", { style: { display: "flex", gap: 30, flexWrap: "wrap" } },
+          React.createElement("div", { style: { flex: 2, minWidth: 300 } },
+            React.createElement("iframe", { className: "yt-embed", src: `https://www.youtube.com/embed/${activeVideo.youtubeId}`, title: activeVideo.title, allowFullScreen: true }),
+            React.createElement("h2", { style: { marginTop: 20, fontSize: 24 } }, activeVideo.title),
+            activeVideo.quiz && activeVideo.quiz.length > 0 && (
+              React.createElement("div", { style: { marginTop: 30, padding: 20, background: "rgba(255,255,255,0.03)", borderRadius: 16 } },
+                React.createElement("h3", { style: { marginBottom: 20 } }, "اختبر معلوماتك"),
+                activeVideo.quiz.map((q, qIdx) => (
+                  React.createElement("div", { key: qIdx, style: { marginBottom: 20 } },
+                    React.createElement("p", { style: { marginBottom: 12 } }, qIdx + 1, ". ", q.q),
+                    q.options.map((opt, oIdx) => (
+                      React.createElement("div", { key: oIdx, className: `quiz-option ${selectedAnswers[qIdx] === oIdx ? 'selected' : ''} ${quizResult ? (oIdx === q.answer ? 'correct' : (selectedAnswers[qIdx] === oIdx ? 'wrong' : '')) : ''}`, onClick: () => !quizResult && handleAnswerSelect(qIdx, oIdx) }, opt)
                     ))
                   )
                 )),
-                !quizResult && React.createElement("button", { className: "btn-primary", onClick: handleSubmitQuiz }, "إرسال الإجابات"),
-                quizResult && React.createElement("div", { style: { marginTop: 20, fontSize: 18, fontWeight: 600, color: "#a78bfa" } }, `نتيجتك: ${quizResult.score} / ${quizResult.total}`)
+                !quizResult ? (
+                  React.createElement("button", { className: "btn-primary", onClick: handleSubmitQuiz }, "تسليم الإجابات")
+                ) : (
+                  React.createElement("div", { style: { textAlign: "center", marginTop: 20, color: "#4ade80", fontSize: 18, fontWeight: 700 } }, "النتيجة: ", quizResult.score, " من ", quizResult.total)
+                )
               )
             )
           ),
-          React.createElement("div", { className: "card" },
-            React.createElement("h3", { style: { fontSize: 20, fontWeight: 600, marginBottom: 20, color: "#e8e8f0" } }, "دروس الدورة"),
-            course.videos.map(video => (
-              React.createElement("div", { key: video.id, style: { display: "flex", alignItems: "center", padding: "10px 0", borderBottom: "1px solid rgba(255,255,255,0.05)", cursor: "pointer" }, onClick: () => setActiveVideo(video) },
-                React.createElement("div", { style: { fontSize: 20, marginRight: 10, color: activeVideo && activeVideo.id === video.id ? "#a78bfa" : "#b0b0c8" } }, "▶"),
-                React.createElement("div", null,
-                  React.createElement("p", { style: { fontWeight: 500, color: activeVideo && activeVideo.id === video.id ? "#e8e8f0" : "#b0b0c8" } }, video.title),
-                  React.createElement("span", { style: { fontSize: 12, color: "#8888a8" } }, video.duration)
-                )
-              ))
-            )
+          React.createElement("div", { style: { flex: 1, minWidth: 250 } },
+            React.createElement("h3", { style: { marginBottom: 20 } }, "قائمة الدروس"),
+            course.videos.map(v => (
+              React.createElement("div", { key: v.id, className: `card ${activeVideo.id === v.id ? 'active' : ''}`, style: { marginBottom: 10, cursor: "pointer", padding: 15, borderColor: activeVideo.id === v.id ? "#6c47ff" : "rgba(108,71,255,0.2)" }, onClick: () => { setActiveVideo(v); setQuizResult(null); setSelectedAnswers({}); } },
+                React.createElement("div", { style: { fontWeight: 600 } }, v.title),
+                React.createElement("div", { style: { fontSize: 12, color: "#8888a8", marginTop: 5 } }, "⏱ ", v.duration)
+              )
+            ))
           )
         )
       )
     );
   }
 
-  // =================== LOGIN PAGE ===================
   function LoginPage({ loginForm, setLoginForm, handleLogin, loginError, setPage }) {
-    const handleChange = (e) => {
-      const { name, value } = e.target;
-      setLoginForm(prev => ({ ...prev, [name]: value }));
-    };
-
     return (
-      React.createElement("div", { style: { maxWidth: 400, margin: "60px auto", padding: "0 20px" } },
-        React.createElement("h2", { style: { fontSize: 28, fontWeight: 700, marginBottom: 30, textAlign: "center", color: "#e8e8f0" } }, "تسجيل الدخول"),
-        React.createElement("div", { className: "card" },
-          React.createElement("div", { style: { marginBottom: 16 } },
-            React.createElement("label", { style: { display: "block", marginBottom: 8, color: "#b0b0c8" } }, "البريد الإلكتروني"),
-            React.createElement("input", { type: "email", name: "email", value: loginForm.email, onChange: handleChange, className: "input-field" })
-          ),
-          React.createElement("div", { style: { marginBottom: 20 } },
-            React.createElement("label", { style: { display: "block", marginBottom: 8, color: "#b0b0c8" } }, "كلمة المرور"),
-            React.createElement("input", { type: "password", name: "password", value: loginForm.password, onChange: handleChange, className: "input-field" })
-          ),
-          loginError && React.createElement("p", { style: { color: "#f87171", marginBottom: 15, textAlign: "center" } }, loginError),
-          React.createElement("button", { className: "btn-primary", style: { width: "100%", marginBottom: 15 }, onClick: handleLogin }, "تسجيل الدخول"),
-          React.createElement("p", { style: { textAlign: "center", color: "#b0b0c8" } },
-            "ليس لديك حساب؟ ",
-            React.createElement("span", { style: { color: "#a78bfa", cursor: "pointer" }, onClick: () => setPage("register") }, "سجل الآن")
-          )
-        )
+      React.createElement("div", { style: { maxWidth: 400, margin: "100px auto", padding: 40, background: "rgba(255,255,255,0.03)", borderRadius: 20, border: "1px solid rgba(108,71,255,0.2)" } },
+        React.createElement("h2", { style: { textAlign: "center", marginBottom: 30 } }, "تسجيل الدخول"),
+        loginError && React.createElement("div", { style: { background: "rgba(239,68,68,0.1)", color: "#f87171", padding: 10, borderRadius: 8, marginBottom: 20, fontSize: 14, textAlign: "center" } }, loginError),
+        React.createElement("input", { type: "email", placeholder: "البريد الإلكتروني", className: "input-field", style: { marginBottom: 15 }, value: loginForm.email, onChange: (e) => setLoginForm({ ...loginForm, email: e.target.value }) }),
+        React.createElement("input", { type: "password", placeholder: "كلمة المرور", className: "input-field", style: { marginBottom: 25 }, value: loginForm.password, onChange: (e) => setLoginForm({ ...loginForm, password: e.target.value }) }),
+        React.createElement("button", { className: "btn-primary", style: { width: "100%", marginBottom: 15 }, onClick: handleLogin }, "دخول"),
+        React.createElement("p", { style: { textAlign: "center", fontSize: 14, color: "#8888a8" } }, "ليس لديك حساب؟ ", React.createElement("span", { style: { color: "#a78bfa", cursor: "pointer" }, onClick: () => setPage("register") }, "سجل الآن"))
       )
     );
   }
 
-  // =================== REGISTER PAGE ===================
   function RegisterPage({ handleRegister, setPage, notify }) {
-    const [form, setForm] = useState({
-      name: "",
-      email: "",
-      password: ""
-    });
+    const [form, setForm] = useState({ name: "", email: "", password: "" });
+    const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
-    const handleChange = (e) => {
-      const { name, value } = e.target;
-      setForm(prev => ({ ...prev, [name]: value }));
-    };
-
-    const handleSubmit = async () => {
+    const onSubmit = async () => {
+      setError("");
       setLoading(true);
-      const result = await handleRegister(form);
-      if (result.ok) {
-        notify("✓ تم التسجيل بنجاح! يمكنك الآن تسجيل الدخول.", "success");
+      const res = await handleRegister(form);
+      if (res.ok) {
+        notify("✓ تم إنشاء الحساب بنجاح، يمكنك الآن تسجيل الدخول");
         setPage("login");
       } else {
-        notify(`✗ ${result.error}`, "error");
+        setError(res.error);
       }
       setLoading(false);
     };
 
     return (
-      React.createElement("div", { style: { maxWidth: 400, margin: "60px auto", padding: "0 20px" } },
-        React.createElement("h2", { style: { fontSize: 28, fontWeight: 700, marginBottom: 30, textAlign: "center", color: "#e8e8f0" } }, "إنشاء حساب جديد"),
-        React.createElement("div", { className: "card" },
-          React.createElement("div", { style: { marginBottom: 16 } },
-            React.createElement("label", { style: { display: "block", marginBottom: 8, color: "#b0b0c8" } }, "الاسم"),
-            React.createElement("input", { type: "text", name: "name", value: form.name, onChange: handleChange, className: "input-field" })
-          ),
-          React.createElement("div", { style: { marginBottom: 16 } },
-            React.createElement("label", { style: { display: "block", marginBottom: 8, color: "#b0b0c8" } }, "البريد الإلكتروني"),
-            React.createElement("input", { type: "email", name: "email", value: form.email, onChange: handleChange, className: "input-field" })
-          ),
-          React.createElement("div", { style: { marginBottom: 20 } },
-            React.createElement("label", { style: { display: "block", marginBottom: 8, color: "#b0b0c8" } }, "كلمة المرور"),
-            React.createElement("input", { type: "password", name: "password", value: form.password, onChange: handleChange, className: "input-field" })
-          ),
-          React.createElement("button", { className: "btn-primary", style: { width: "100%", marginBottom: 15 }, onClick: handleSubmit, disabled: loading },
-            loading ? React.createElement("span", { className: "spinner" }) : "تسجيل"
-          ),
-          React.createElement("p", { style: { textAlign: "center", color: "#b0b0c8" } },
-            "لديك حساب بالفعل؟ ",
-            React.createElement("span", { style: { color: "#a78bfa", cursor: "pointer" }, onClick: () => setPage("login") }, "تسجيل الدخول")
-          )
-        )
+      React.createElement("div", { style: { maxWidth: 400, margin: "100px auto", padding: 40, background: "rgba(255,255,255,0.03)", borderRadius: 20, border: "1px solid rgba(108,71,255,0.2)" } },
+        React.createElement("h2", { style: { textAlign: "center", marginBottom: 30 } }, "إنشاء حساب جديد"),
+        error && React.createElement("div", { style: { background: "rgba(239,68,68,0.1)", color: "#f87171", padding: 10, borderRadius: 8, marginBottom: 20, fontSize: 14, textAlign: "center" } }, error),
+        React.createElement("input", { type: "text", placeholder: "الاسم الكامل", className: "input-field", style: { marginBottom: 15 }, value: form.name, onChange: (e) => setForm({ ...form, name: e.target.value }) }),
+        React.createElement("input", { type: "email", placeholder: "البريد الإلكتروني", className: "input-field", style: { marginBottom: 15 }, value: form.email, onChange: (e) => setForm({ ...form, email: e.target.value }) }),
+        React.createElement("input", { type: "password", placeholder: "كلمة المرور", className: "input-field", style: { marginBottom: 25 }, value: form.password, onChange: (e) => setForm({ ...form, password: e.target.value }) }),
+        React.createElement("button", { className: "btn-primary", style: { width: "100%", marginBottom: 15 }, onClick: onSubmit, disabled: loading }, loading ? "جاري المعالجة..." : "تسجيل"),
+        React.createElement("p", { style: { textAlign: "center", fontSize: 14, color: "#8888a8" } }, "لديك حساب بالفعل؟ ", React.createElement("span", { style: { color: "#a78bfa", cursor: "pointer" }, onClick: () => setPage("login") }, "سجل دخول"))
       )
     );
   }
 
-  // =================== STUDENT DASHBOARD ===================
   function StudentDashboard({ user, data, setPage, setSelectedCourse }) {
-    const enrolledCourses = data.courses.filter(c => data.enrollments.some(e => e.user_id === user.id && e.course_id === c.id));
-
     return (
-      React.createElement("div", { style: { maxWidth: 1200, margin: "40px auto", padding: "0 20px" } },
-        React.createElement("h2", { style: { fontSize: 28, fontWeight: 700, marginBottom: 30, color: "#e8e8f0" } }, `مرحباً، ${user.name}`),
-        React.createElement("div", { className: "card", style: { marginBottom: 30 } },
-          React.createElement("h3", { style: { fontSize: 20, fontWeight: 600, marginBottom: 15, color: "#e8e8f0" } }, "دوراتي"),
-          enrolledCourses.length > 0 ? (
-            React.createElement("div", { className: "grid-3" },
-              enrolledCourses.map(course => (
-                React.createElement(CourseCard, { key: course.id, course: course, onClick: () => setSelectedCourse(course), setPage: setPage })
-              ))
-            )
-          ) : (
-            React.createElement("p", { style: { color: "#b0b0c8" } }, "لم تسجل في أي دورات بعد. ", React.createElement("span", { style: { color: "#a78bfa", cursor: "pointer" }, onClick: () => setPage("courses") }, "تصفح الدورات المتاحة"))
+      React.createElement("div", { style: { maxWidth: 1000, margin: "40px auto", padding: "0 20px" } },
+        React.createElement("div", { className: "card", style: { marginBottom: 30, display: "flex", alignItems: "center", gap: 20 } },
+          React.createElement("div", { style: { width: 80, height: 80, borderRadius: "50%", background: "linear-gradient(135deg,#6c47ff,#a855f7)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32, fontWeight: 800 } }, user.avatar),
+          React.createElement("div", null,
+            React.createElement("h2", null, "أهلاً بك، ", user.name),
+            React.createElement("p", { style: { color: "#8888a8", marginTop: 5 } }, "طالب في أكاديمية البعد الجديد")
           )
+        ),
+        React.createElement("h3", { style: { marginBottom: 20 } }, "دوراتي المسجلة"),
+        React.createElement("div", { className: "grid-3" },
+          data.courses.slice(0, 2).map(course => (
+            React.createElement(CourseCard, { key: course.id, course: course, onClick: () => setSelectedCourse(course), setPage: setPage })
+          ))
         )
       )
     );
   }
 
-  // =================== ADMIN PANEL ===================
   function AdminPanel({ data, setData, adminSection, setAdminSection, setModal, notify, syncUsers }) {
-    const sections = [
-      { id: "users", label: "إدارة المستخدمين" },
-      { id: "courses", label: "إدارة الدورات" },
-      { id: "settings", label: "إعدادات الموقع" },
-      { id: "links", label: "إدارة الروابط" }
-    ];
-
-    const handleToggleBan = async (id) => {
-      try {
-        await DB.toggleBan(id);
-        notify("✓ تم تغيير حالة المستخدم");
-        syncUsers();
-      } catch (e) {
-        notify(`✗ حدث خطأ: ${e.message}`, "error");
-      }
-    };
-
-    const handleDeleteUser = async (id) => {
-      if (window.confirm("هل أنت متأكد من حذف هذا المستخدم؟")) {
-        try {
-          await DB.remove(id);
-          notify("✓ تم حذف المستخدم");
-          syncUsers();
-        } catch (e) {
-          notify(`✗ حدث خطأ: ${e.message}`, "error");
-        }
-      }
-    };
-
-    const handleAddCourse = () => {
-      setModal({ type: "edit-course", title: "إضافة دورة جديدة", data: { id: Date.now(), title: "", icon: "", category: "", units: 0, price: 0, status: "draft", students: 0 } });
-    };
-
-    const handleEditCourse = (course) => {
-      setModal({ type: "edit-course", title: "تعديل الدورة", data: course });
-    };
-
     return (
-      React.createElement("div", { style: { maxWidth: 1200, margin: "40px auto", padding: "0 20px" } },
-        React.createElement("h2", { style: { fontSize: 28, fontWeight: 700, marginBottom: 30, color: "#e8e8f0" } }, "لوحة تحكم المدير"),
-        React.createElement("div", { style: { display: "grid", gridTemplateColumns: "250px 1fr", gap: 30 } },
-          React.createElement("div", { className: "card", style: { padding: "20px 0" } },
-            sections.map(section => (
-              React.createElement("div", { key: section.id, className: `sidebar-item ${adminSection === section.id ? 'active' : ''}`, onClick: () => setAdminSection(section.id) }, section.label)
-            ))
-          ),
-          React.createElement("div", null,
-            adminSection === "users" && (
-              React.createElement("div", { className: "card" },
-                React.createElement("h3", { style: { fontSize: 20, fontWeight: 600, marginBottom: 20, color: "#e8e8f0" } }, "إدارة المستخدمين"),
-                React.createElement("button", { className: "btn-primary", onClick: () => setModal({ type: "add-user", title: "إضافة مستخدم جديد" }), style: { marginBottom: 20 } }, "+ إضافة مستخدم"),
-                React.createElement("div", { style: { overflowX: "auto" } },
-                  React.createElement("table", { style: { width: "100%", borderCollapse: "collapse" } },
-                    React.createElement("thead", null,
-                      React.createElement("tr", { style: { borderBottom: "1px solid rgba(255,255,255,0.1)" } },
-                        React.createElement("th", { style: { padding: "10px 0", textAlign: "right", color: "#b0b0c8" } }, "الاسم"),
-                        React.createElement("th", { style: { padding: "10px 0", textAlign: "right", color: "#b0b0c8" } }, "البريد الإلكتروني"),
-                        React.createElement("th", { style: { padding: "10px 0", textAlign: "right", color: "#b0b0c8" } }, "الدور"),
-                        React.createElement("th", { style: { padding: "10px 0", textAlign: "right", color: "#b0b0c8" } }, "الحالة"),
-                        React.createElement("th", { style: { padding: "10px 0", textAlign: "right", color: "#b0b0c8" } }, "إجراءات")
-                      )
-                    ),
-                    React.createElement("tbody", null,
-                      data.users.map(u => (
-                        React.createElement("tr", { key: u.id, className: "table-row" },
-                          React.createElement("td", { style: { padding: "10px 0", color: "#e8e8f0" } }, u.name),
-                          React.createElement("td", { style: { padding: "10px 0", color: "#e8e8f0" } }, u.email),
-                          React.createElement("td", { style: { padding: "10px 0" } }, React.createElement("span", { className: `badge ${u.role === 'admin' ? 'badge-purple' : u.role === 'teacher' ? 'badge-blue' : 'badge-yellow'}` }, u.role === 'admin' ? 'مدير' : u.role === 'teacher' ? 'معلم' : 'طالب')),
-                          React.createElement("td", { style: { padding: "10px 0" } }, React.createElement("span", { className: `badge ${u.status === 'active' ? 'badge-green' : 'badge-red'}` }, u.status === 'active' ? 'نشط' : 'محظور')),
-                          React.createElement("td", { style: { padding: "10px 0" } },
-                            React.createElement("button", { className: "btn-outline", onClick: () => setModal({ type: "edit-user", title: "تعديل المستخدم", data: u }), style: { marginRight: 10 } }, "تعديل"),
-                            React.createElement("button", { className: `btn-${u.status === 'active' ? 'danger' : 'success'}`, onClick: () => handleToggleBan(u.id), style: { marginRight: 10 } }, u.status === 'active' ? 'حظر' : 'تفعيل'),
-                            React.createElement("button", { className: "btn-danger", onClick: () => handleDeleteUser(u.id) }, "حذف")
+      React.createElement("div", { style: { display: "flex", minHeight: "calc(100vh - 64px)" } },
+        React.createElement("div", { style: { width: 240, background: "rgba(255,255,255,0.02)", borderLeft: "1px solid rgba(108,71,255,0.1)", padding: 20 } },
+          React.createElement("div", { className: `sidebar-item ${adminSection === 'users' ? 'active' : ''}`, onClick: () => setAdminSection('users') }, "👥 المستخدمين"),
+          React.createElement("div", { className: `sidebar-item ${adminSection === 'courses' ? 'active' : ''}`, onClick: () => setAdminSection('courses') }, "📚 الدورات"),
+          React.createElement("div", { className: `sidebar-item ${adminSection === 'settings' ? 'active' : ''}`, onClick: () => setAdminSection('settings') }, "⚙️ الإعدادات")
+        ),
+        React.createElement("div", { style: { flex: 1, padding: 40 } },
+          adminSection === 'users' && (
+            React.createElement("div", null,
+              React.createElement("div", { style: { display: "flex", justifyContent: "space-between", marginBottom: 30 } },
+                React.createElement("h2", null, "إدارة المستخدمين"),
+                React.createElement("button", { className: "btn-primary", onClick: () => setModal({ title: "إضافة مستخدم", type: "add-user" }) }, "+ مستخدم جديد")
+              ),
+              React.createElement("table", { style: { width: "100%", borderCollapse: "collapse" } },
+                React.createElement("thead", null,
+                  React.createElement("tr", { style: { textAlign: "right", color: "#8888a8", fontSize: 14 } },
+                    React.createElement("th", { style: { padding: 15 } }, "المستخدم"),
+                    React.createElement("th", { style: { padding: 15 } }, "الرتبة"),
+                    React.createElement("th", { style: { padding: 15 } }, "الحالة"),
+                    React.createElement("th", { style: { padding: 15 } }, "تاريخ الانضمام"),
+                    React.createElement("th", { style: { padding: 15 } }, "إجراءات")
+                  )
+                ),
+                React.createElement("tbody", null,
+                  data.users.map(u => (
+                    React.createElement("tr", { key: u.id, className: "table-row" },
+                      React.createElement("td", { style: { padding: 15 } },
+                        React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10 } },
+                          React.createElement("div", { style: { width: 32, height: 32, borderRadius: "50%", background: "#333", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12 } }, u.avatar),
+                          React.createElement("div", null,
+                            React.createElement("div", { style: { fontWeight: 600 } }, u.name),
+                            React.createElement("div", { style: { fontSize: 12, color: "#666" } }, u.email)
                           )
                         )
-                      ))
-                    )
-                  )
-                )
-              )
-            ),
-            adminSection === "courses" && (
-              React.createElement("div", { className: "card" },
-                React.createElement("h3", { style: { fontSize: 20, fontWeight: 600, marginBottom: 20, color: "#e8e8f0" } }, "إدارة الدورات"),
-                React.createElement("button", { className: "btn-primary", onClick: handleAddCourse, style: { marginBottom: 20 } }, "+ إضافة دورة"),
-                React.createElement("div", { style: { overflowX: "auto" } },
-                  React.createElement("table", { style: { width: "100%", borderCollapse: "collapse" } },
-                    React.createElement("thead", null,
-                      React.createElement("tr", { style: { borderBottom: "1px solid rgba(255,255,255,0.1)" } },
-                        React.createElement("th", { style: { padding: "10px 0", textAlign: "right", color: "#b0b0c8" } }, "العنوان"),
-                        React.createElement("th", { style: { padding: "10px 0", textAlign: "right", color: "#b0b0c8" } }, "الفئة"),
-                        React.createElement("th", { style: { padding: "10px 0", textAlign: "right", color: "#b0b0c8" } }, "الحالة"),
-                        React.createElement("th", { style: { padding: "10px 0", textAlign: "right", color: "#b0b0c8" } }, "الطلاب"),
-                        React.createElement("th", { style: { padding: "10px 0", textAlign: "right", color: "#b0b0c8" } }, "إجراءات")
+                      ),
+                      React.createElement("td", { style: { padding: 15 } }, React.createElement("span", { className: `badge ${u.role === 'admin' ? 'badge-purple' : (u.role === 'teacher' ? 'badge-blue' : 'badge-green')}` }, u.role)),
+                      React.createElement("td", { style: { padding: 15 } }, React.createElement("span", { className: `badge ${u.status === 'active' ? 'badge-green' : 'badge-red'}` }, u.status)),
+                      React.createElement("td", { style: { padding: 15, fontSize: 13 } }, u.joined),
+                      React.createElement("td", { style: { padding: 15 } },
+                        React.createElement("button", { className: "btn-outline", style: { padding: "4px 8px", fontSize: 12, marginLeft: 5 }, onClick: () => setModal({ title: "تعديل مستخدم", type: "edit-user", data: u }) }, "تعديل"),
+                        u.email !== ADMIN_EMAIL && React.createElement("button", { className: "btn-danger", style: { padding: "4px 8px", fontSize: 12 }, onClick: async () => { if (confirm('هل أنت متأكد؟')) { await DB.remove(u.id); syncUsers(); } } }, "حذف")
                       )
-                    ),
-                    React.createElement("tbody", null,
-                      data.courses.map(course => (
-                        React.createElement("tr", { key: course.id, className: "table-row" },
-                          React.createElement("td", { style: { padding: "10px 0", color: "#e8e8f0" } }, course.title),
-                          React.createElement("td", { style: { padding: "10px 0", color: "#e8e8f0" } }, course.category),
-                          React.createElement("td", { style: { padding: "10px 0" } }, React.createElement("span", { className: `badge ${course.status === 'published' ? 'badge-green' : 'badge-yellow'}` }, course.status === 'published' ? 'منشور' : 'مسودة')),
-                          React.createElement("td", { style: { padding: "10px 0", color: "#e8e8f0" } }, course.students),
-                          React.createElement("td", { style: { padding: "10px 0" } },
-                            React.createElement("button", { className: "btn-outline", onClick: () => handleEditCourse(course) }, "تعديل")
-                          )
-                        )
-                      ))
-                    )
-                  )
-                )
-              )
-            ),
-            adminSection === "settings" && (
-              React.createElement("div", { className: "card" },
-                React.createElement("h3", { style: { fontSize: 20, fontWeight: 600, marginBottom: 20, color: "#e8e8f0" } }, "إعدادات الموقع"),
-                React.createElement("button", { className: "btn-primary", onClick: () => setModal({ type: "edit-settings", title: "تعديل إعدادات الموقع", data: data.settings }), style: { marginBottom: 20 } }, "تعديل الإعدادات"),
-                React.createElement("div", null,
-                  Object.entries(data.settings).map(([key, value]) => (
-                    React.createElement("p", { key: key, style: { marginBottom: 10, color: "#e8e8f0" } },
-                      React.createElement("strong", { style: { color: "#a78bfa" } }, key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())), ": ", String(value)
                     )
                   ))
                 )
               )
-            ),
-            adminSection === "links" && (
-              React.createElement(LinksPage, { data: data, setData: setData, user: { role: "admin" }, notify: notify })
+            )
+          ),
+          adminSection === 'courses' && (
+            React.createElement("div", null,
+              React.createElement("h2", { style: { marginBottom: 30 } }, "إدارة الدورات"),
+              React.createElement("div", { className: "grid-3" },
+                data.courses.map(c => (
+                  React.createElement("div", { key: c.id, className: "card" },
+                    React.createElement("div", { style: { fontSize: 32, marginBottom: 10 } }, c.icon),
+                    React.createElement("h4", null, c.title),
+                    React.createElement("p", { style: { fontSize: 12, color: "#666", margin: "10px 0" } }, c.category),
+                    React.createElement("div", { style: { display: "flex", gap: 10, marginTop: 15 } },
+                      React.createElement("button", { className: "btn-outline", style: { flex: 1 }, onClick: () => setModal({ title: "تعديل دورة", type: "edit-course", data: c }) }, "تعديل")
+                    )
+                  )
+                ))
+              )
+            )
+          ),
+          adminSection === 'settings' && (
+            React.createElement("div", null,
+              React.createElement("h2", { style: { marginBottom: 30 } }, "إعدادات الموقع"),
+              React.createElement("div", { className: "card", style: { maxWidth: 500 } },
+                Object.entries(data.settings).map(([k, v]) => (
+                  React.createElement("div", { key: k, style: { marginBottom: 15, display: "flex", justifyContent: "space-between" } },
+                    React.createElement("span", { style: { color: "#8888a8" } }, k),
+                    React.createElement("span", null, String(v))
+                  )
+                )),
+                React.createElement("button", { className: "btn-primary", style: { width: "100%", marginTop: 20 }, onClick: () => setModal({ title: "تعديل الإعدادات", type: "edit-settings", data: data.settings }) }, "تعديل الإعدادات")
+              )
             )
           )
         )
@@ -1090,12 +954,11 @@
     );
   }
 
-  // =================== APP ===================
   function App() {
     const [page, setPage] = useState("home");
     const [user, setUser] = useState(null);
-    const [data, setData] = useState(initialData);
     const [loading, setLoading] = useState(true);
+    const [data, setData] = useState(initialData);
     const [notification, setNotification] = useState(null);
     const [modal, setModal] = useState(null);
     const [loginForm, setLoginForm] = useState({ email: "", password: "" });
